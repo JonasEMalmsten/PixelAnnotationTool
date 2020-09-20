@@ -64,7 +64,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
 	connect(button_watershed      , SIGNAL(released())                        , this, SLOT(runWatershed()  ));
     connect(swap_action           , SIGNAL(triggered())                       , this, SLOT(swapView()      ));
-	connect(actionOpen_config_file, SIGNAL(triggered())                       , this, SLOT(loadConfigFile()));
+	connect(actionOpen_config_file, SIGNAL(triggered())                       , this, SLOT(openConfigFile()));
 	connect(actionSave_config_file, SIGNAL(triggered())                       , this, SLOT(saveConfigFile()));
     connect(close_tab_action      , SIGNAL(triggered())                       , this, SLOT(closeCurrentTab()));
     connect(copy_mask_action      , SIGNAL(triggered())                       , this, SLOT(copyMask()));
@@ -78,8 +78,10 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags)
 
     registerShortcuts();
 
-	labels = defaultLabels();
-	loadConfigLabels();
+	if (!loadConfigFile(defaultConfigFile)) {
+		labels = defaultLabels();
+		loadConfigLabels();
+	}
 
 	connect(list_label, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(changeLabel(QListWidgetItem*, QListWidgetItem*)));
 	connect(list_label, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(changeColor(QListWidgetItem*)));
@@ -405,12 +407,14 @@ void MainWindow::saveConfigFile() {
 	save_file.close();
 }
 
-void MainWindow::loadConfigFile() {
-	QString file = QFileDialog::getOpenFileName(this, tr("Open Config File"), QString(), tr("JSon file (*.json)"));
+bool MainWindow::loadConfigFile(QString file) {
+	QFileInfo check_file(file);
+	if (!check_file.exists() || !check_file.isFile()) return false;
+
 	QFile open_file(file);
 	if (!open_file.open(QIODevice::ReadOnly)) {
 		qWarning("Couldn't open save file.");
-		return;
+		return false;
 	}
 	QJsonObject object;
 	QByteArray saveData = open_file.readAll();
@@ -422,6 +426,12 @@ void MainWindow::loadConfigFile() {
 
 	loadConfigLabels();
 	update();
+	return true;
+}
+
+void MainWindow::openConfigFile() {
+	QString file = QFileDialog::getOpenFileName(this, tr("Open Config File"), QString(), tr("JSon file (*.json)"));
+	loadConfigFile(file);
 }
 
 void MainWindow::on_actionAbout_triggered() {

@@ -31,7 +31,7 @@ public:
     MainWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 
 private:
-
+	QString defaultConfigFile = "config.json";
 	void loadConfigLabels();
     QString stringForShortCut(int id) const;
     void registerShortcuts();
@@ -74,7 +74,8 @@ public slots:
 	void changeLabel(QListWidgetItem*, QListWidgetItem*);
 	void changeColor(QListWidgetItem*);
 	void saveConfigFile();
-	void loadConfigFile();
+	bool loadConfigFile(QString);
+	void openConfigFile();
 	void runWatershed();
     void swapView();
 	void on_tree_widget_img_currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *);
