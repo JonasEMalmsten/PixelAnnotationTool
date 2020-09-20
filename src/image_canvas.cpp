@@ -3,7 +3,8 @@
 #include "main_window.h"
 
 #include <QtDebug>
-#include <QtWidgets>
+
+bool ImageCanvas::_short_file_extension = false;
 
 ImageCanvas::ImageCanvas(MainWindow *ui) :
     QLabel() ,
@@ -44,6 +45,11 @@ void ImageCanvas::_initPixmap() {
 	setPixmap(newPixmap);
 }
 
+QString ImageCanvas::_getBaseName(QFileInfo file) {
+	if (_short_file_extension) return file.completeBaseName();
+	else return file.baseName();
+}
+
 void ImageCanvas::loadImage(const QString &filename) {
 	if (!_image.isNull() )
 		saveMask();
@@ -54,8 +60,8 @@ void ImageCanvas::loadImage(const QString &filename) {
 
 	_image = mat2QImage(cv::imread(_img_file.toStdString()));
 	
-	_mask_file = file.dir().absolutePath()+ "/" + file.baseName() + "_mask.png";
-	_watershed_file = file.dir().absolutePath()+ "/" + file.baseName() + "_watershed_mask.png";
+	_mask_file = file.dir().absolutePath()+ "/" + _getBaseName(file) + "_mask.png";
+	_watershed_file = file.dir().absolutePath()+ "/" + _getBaseName(file) + "_watershed_mask.png";
 
 	_watershed = ImageMask(_image.size());
 	_undo_list.clear();
@@ -88,7 +94,7 @@ void ImageCanvas::saveMask() {
 //         }
 		watershed.save(_watershed_file);
 		QFileInfo file(_img_file);
-		QString color_file = file.dir().absolutePath() + "/" + file.baseName() + "_color_mask.png";
+		QString color_file = file.dir().absolutePath() + "/" + _getBaseName(file) + "_color_mask.png";
 		idToColor(watershed, _ui->id_labels).save(color_file);
 	}
     _undo_list.clear();

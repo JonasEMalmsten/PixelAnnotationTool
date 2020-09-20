@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QPen>
 #include <QScrollArea>
+#include <QtWidgets>
 
 class MainWindow;
 
@@ -18,12 +19,13 @@ public:
 	ImageCanvas(MainWindow *ui);
     ~ImageCanvas();
 
+	static void setShortFileExtension(bool value) { _short_file_extension = value; }
+
 	void setId(int id);
 	void setMask(const ImageMask & mask);
     void setActionMask(const ImageMask & mask);
     ImageMask getMask() const { return _mask; }
     QImage getImage() const { return _image; }
-
 
 	void setWatershedMask(QImage watershed);
 	void refresh();
@@ -71,6 +73,10 @@ private:
 	ColorMask        _color            ;
 	int              _pen_size         ;
 	bool             _button_is_pressed;
+
+	static bool      _short_file_extension;
+	QString _getBaseName(QFileInfo file);
+
 
 };
 

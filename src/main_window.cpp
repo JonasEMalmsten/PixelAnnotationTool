@@ -419,9 +419,13 @@ bool MainWindow::loadConfigFile(QString file) {
 	QJsonObject object;
 	QByteArray saveData = open_file.readAll();
 	QJsonDocument loadDoc(QJsonDocument::fromJson(saveData));
+	QJsonObject json = loadDoc.object();
 
 	labels.clear();
-	labels.read(loadDoc.object());
+	labels.read(json);
+
+	ImageCanvas::setShortFileExtension(json["short_file_extension"].toBool());
+
 	open_file.close();
 
 	loadConfigLabels();
